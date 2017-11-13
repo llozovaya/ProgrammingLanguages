@@ -23,6 +23,7 @@
 ;; Problem 1
 
 ;; CHANGE (put your solutions here)
+<<<<<<< HEAD
 (define (racketlist->mupllist lst)
   (if (null? lst) (aunit)
       (apair (car lst) (racketlist->mupllist (cdr lst)))))
@@ -31,6 +32,8 @@
 (define (mupllist->racketlist lst)
   (if (isaunit lst) null
     (cons (fst lst) (mupllist->racketlist (snd lst)))))  
+=======
+>>>>>>> 62d9d11... вторая часть hw5
 
 ;; Problem 2
 
@@ -57,6 +60,7 @@
                        (int-num v2)))
                (error "MUPL addition applied to non-number")))]
         ;; CHANGE add more cases here
+<<<<<<< HEAD
         [(int? e) e]
         [(apair? e)
           (cons
@@ -98,6 +102,8 @@
                        (cons (cons (fun-nameopt f) f) c)
                        c)))
                 (error "call applied to non-function")))]
+=======
+>>>>>>> 62d9d11... вторая часть hw5
         [#t (error (format "bad MUPL expression: ~v" e))]))
 
 ;; Do NOT change
@@ -106,6 +112,7 @@
         
 ;; Problem 3
 
+<<<<<<< HEAD
 (define (ifaunit e1 e2 e3) "CHANGE")
 
 (define (mlet* lstlst e2) "CHANGE")
@@ -119,6 +126,33 @@
 (define mupl-mapAddN 
   (mlet "map" mupl-map
         "CHANGE (notice map is now in MUPL scope)"))
+=======
+(define (ifaunit e1 e2 e3)
+  (ifgreater ((isaunit e1) (int 0) e2 e3)))
+
+(define (mlet* lstlst e2)
+  (letrec ([f (lambda (lst)
+       (if
+          (null? lst)
+          e2
+          (let ([head (car lst)]) (mlet (car head) (cdr head) (f (cdr lst))))))])
+  (f lstlst)))
+
+
+(define (ifeq e1 e2 e3 e4)
+  (mlet* (list (cons "_x" e1) (cons "_y" e2))
+    (ifgreater (int "_x") (int "_y") e4 (ifgreater (int "_x") (int "_y") e4 e3))))
+
+;; Problem 4
+
+(define mupl-map
+  (lambda (f)
+    (lambda (lst)
+      (ifaunit lst lst (apair (f (fst lst)) ((mupl-map f (snd lst))))))))
+
+(define mupl-mapAddN
+    (lambda (i) (mlet ("f" (fun "f" "x" (add i "x"))) (mupl-map "f"))))
+>>>>>>> 62d9d11... вторая часть hw5
 
 ;; Challenge Problem
 
