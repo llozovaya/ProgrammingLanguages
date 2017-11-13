@@ -23,17 +23,14 @@
 ;; Problem 1
 
 ;; CHANGE (put your solutions here)
-<<<<<<< HEAD
 (define (racketlist->mupllist lst)
   (if (null? lst) (aunit)
       (apair (car lst) (racketlist->mupllist (cdr lst)))))
 
 
 (define (mupllist->racketlist lst)
-  (if (isaunit lst) null
-    (cons (fst lst) (mupllist->racketlist (snd lst)))))  
-=======
->>>>>>> 62d9d11... вторая часть hw5
+  (if (aunit? lst) null
+    (cons (apair-e1 lst) (mupllist->racketlist (apair-e2 lst)))))  
 
 ;; Problem 2
 
@@ -60,39 +57,38 @@
                        (int-num v2)))
                (error "MUPL addition applied to non-number")))]
         ;; CHANGE add more cases here
-<<<<<<< HEAD
         [(int? e) e]
         [(apair? e)
-          (cons
+          (apair
            (eval-under-env (apair-e1 e) env)
            (eval-under-env (apair-e2 e) env))]
         [(fst? e)
-         (let ([v (eval-under-env e env)])
-           (if (pair? v)
-             (car v)
+         (let ([v (eval-under-env (fst-e e) env)])
+           (if (apair? v)
+             (apair-e1 v)
              (error "MUPL getting first element applied to non-pair")))]
         [(snd? e)
-         (let ([v (eval-under-env e env)])
-           (if (pair? v)
-             (cdr v)
+         (let ([v (eval-under-env (snd-e e) env)])
+           (if (apair? v)
+             (apair-e2 v)
              (error "MUPL geting second element applied to non-pair")))]
         [(ifgreater? e)
          (let ([v1 (eval-under-env (ifgreater-e1 e) env)]
                [v2 (eval-under-env (ifgreater-e2 e) env)])
            (if (and (int? v1) (int? v2))
-               (if (v1 > v2)
+               (if (> (int-num v1) (int-num v2))
                    (eval-under-env (ifgreater-e3 e) env)
                    (eval-under-env (ifgreater-e4 e) env))
                (error "MUPL ifgreater function applied to non-integer")))]
         [(aunit? e) e]
-        [(isaunit? e) (if (aunit? (eval-under-env e env)) 1 0)]
+        [(isaunit? e) (if (aunit? (eval-under-env (isaunit-e e) env)) (int 1) (int 0))]
         [(mlet? e)
-         (let ([v (eval-under-env (mlet-e e))])
+         (let ([v (eval-under-env (mlet-e e) env)])
            (eval-under-env (mlet-body e) (cons (cons (mlet-var e) v) env)))]
         [(fun? e) (closure env e)]
         [(call? e)
          (let ([clos (eval-under-env (call-funexp e) env)]
-               [vars (eval-under-env (call-funexp e) env)])
+               [vars (eval-under-env (call-actual e) env)])
            (if (closure? clos)
                 (let* ([f (closure-fun clos)]
                      [c (cons (cons (fun-formal f) vars) (closure-env clos))])
@@ -102,8 +98,7 @@
                        (cons (cons (fun-nameopt f) f) c)
                        c)))
                 (error "call applied to non-function")))]
-=======
->>>>>>> 62d9d11... вторая часть hw5
+        [(closure? e) e]
         [#t (error (format "bad MUPL expression: ~v" e))]))
 
 ;; Do NOT change
@@ -111,24 +106,8 @@
   (eval-under-env e null))
         
 ;; Problem 3
-
-<<<<<<< HEAD
-(define (ifaunit e1 e2 e3) "CHANGE")
-
-(define (mlet* lstlst e2) "CHANGE")
-
-(define (ifeq e1 e2 e3 e4) "CHANGE")
-
-;; Problem 4
-
-(define mupl-map "CHANGE")
-
-(define mupl-mapAddN 
-  (mlet "map" mupl-map
-        "CHANGE (notice map is now in MUPL scope)"))
-=======
 (define (ifaunit e1 e2 e3)
-  (ifgreater ((isaunit e1) (int 0) e2 e3)))
+  (ifgreater (isaunit e1) (int 0) e2 e3))
 
 (define (mlet* lstlst e2)
   (letrec ([f (lambda (lst)
@@ -141,18 +120,19 @@
 
 (define (ifeq e1 e2 e3 e4)
   (mlet* (list (cons "_x" e1) (cons "_y" e2))
-    (ifgreater (int "_x") (int "_y") e4 (ifgreater (int "_x") (int "_y") e4 e3))))
+    (ifgreater (var "_x") (var "_y") e4 (ifgreater (var "_y") (var "_x") e4 e3))))
 
 ;; Problem 4
 
 (define mupl-map
-  (lambda (f)
-    (lambda (lst)
-      (ifaunit lst lst (apair (f (fst lst)) ((mupl-map f (snd lst))))))))
+  (fun "mupl-map" "f"
+    (fun #f "lst"
+      (ifaunit (var "lst") (var "lst")
+               (apair (call (var "f") (fst (var "lst")))
+                      (call (call (var "mupl-map") (var "f")) (snd (var "lst"))))))))
 
 (define mupl-mapAddN
-    (lambda (i) (mlet ("f" (fun "f" "x" (add i "x"))) (mupl-map "f"))))
->>>>>>> 62d9d11... вторая часть hw5
+    (lambda (i) (mlet ("f" (fun "f" "x" (add i (var "x")))) (mupl-map (var "f")))))
 
 ;; Challenge Problem
 
