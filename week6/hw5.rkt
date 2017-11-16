@@ -95,11 +95,12 @@
                  (eval-under-env
                   (fun-body f)
                    (if (fun-nameopt f)
-                       (cons (cons (fun-nameopt f) f) c)
+                       (cons (cons (fun-nameopt f) clos) c)
                        c)))
                 (error "call applied to non-function")))]
         [(closure? e) e]
         [#t (error (format "bad MUPL expression: ~v" e))]))
+
 
 ;; Do NOT change
 (define (eval-exp e)
@@ -132,7 +133,7 @@
                       (call (call (var "mupl-map") (var "f")) (snd (var "lst"))))))))
 
 (define mupl-mapAddN
-    (lambda (i) (mlet ("f" (fun "f" "x" (add i (var "x")))) (mupl-map (var "f")))))
+    (fun #f "i" (mlet "f" (fun "f" "x" (add (var "i") (var "x"))) (call mupl-map (var "f")))))
 
 ;; Challenge Problem
 
