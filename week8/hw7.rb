@@ -118,6 +118,46 @@ class Point < GeometryValue
     @x = x
     @y = y
   end
+
+  def eval_prog env
+      self
+  end
+
+  def preprocess_prog 
+      self
+  end
+
+  def shift (dx,dy)
+      Point.new(x+dx,y+dy)
+  end
+
+  def intersect other
+    other.intersectPoint self
+  end
+
+  def intersectPoint p
+      if (real_close_point(x,y,p.x,p.y))
+        then Point.new(x,y) 
+      else NoPoints
+      end
+  end
+
+  def intersectLine l
+      if (real_close(y, x*l.m+l.b))
+          then Point.new(x,y)
+      else NoPoints
+      end
+  end
+
+  def intersectVerticalLine vline
+      if (real_close(x,vline.x))
+          then Point.new(x,y)
+      else NoPoints
+      end
+  end
+
+  def intersectWithSegmentAsLineResult seg
+
 end
 
 class Line < GeometryValue
@@ -128,6 +168,37 @@ class Line < GeometryValue
     @m = m
     @b = b
   end
+
+  def eval_prog env
+      self
+  end
+
+  def preprocess_prog
+      self
+  end
+
+  def shift(dx,dy)
+      Line.new(m,b+dy-m*dx)
+  end
+
+  def intersect other
+      other.intersectLine self
+  end
+
+  def intersectPoint p
+      p.intersectLine self
+  end
+
+  def intersectLine line
+  end
+
+  def intersectVerticalLine vline
+      Point.new(vline.x, m*vline.x+b)
+  end
+
+  def intersectWithSegmentAsLineResult seg
+      seg
+  end
 end
 
 class VerticalLine < GeometryValue
@@ -137,6 +208,42 @@ class VerticalLine < GeometryValue
   def initialize x
     @x = x
   end
+
+  def eval_prog env
+    self
+  end
+
+  def preprocess_prog
+    self
+  end
+
+  def shift (dx, dy)
+      VerticalLine.new(x+dx)
+  end
+
+  def intersect other
+      other.intersectVerticalLine self
+  end
+
+  def intersectPoint p
+      p.intersectVerticalLine self
+  end
+
+  def intersectLine l
+      l.intersectVerticalLine self
+  end
+
+  def intersectVerticalLine vline
+      if (real_close(x, vline.x))
+          then VerticalLine.new(x)
+      else NoPoints
+      end
+  end
+
+  def intersectWithSegmentAsLineResult seg
+      seg
+  end
+
 end
 
 class LineSegment < GeometryValue
